@@ -83,4 +83,3 @@
   {"semestre":10,"codigo":"BA","nombre":"Business Analytics","req":["BI"],"creditos":4},
   {"semestre":10,"codigo":"ELECTIVAS","nombre":"Electivas (18 créditos)","req":[],"creditos":18}
 ]
-
