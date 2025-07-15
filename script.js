@@ -1,5 +1,4 @@
-
-fetch('data/malla.json')
+fetch('datamalla')
   .then(res => res.json())
   .then(malla => {
     const aprobados = new Set();
@@ -7,49 +6,51 @@ fetch('data/malla.json')
     const contador = document.getElementById('contador');
     const niveles = [...new Set(malla.map(c => c.semestre))].sort((a, b) => a - b);
 
-    niveles.forEach(n => {
-      const sec = document.createElement('div');
-      sec.className = 'semestre';
-      sec.innerHTML = `<h2>Nivel ${n}</h2>`;
-      malla.filter(c => c.semestre === n).forEach(c => {
-        const btn = document.createElement('div');
-        btn.className = 'curso';
-        btn.id = c.codigo;
-        btn.textContent = `${c.codigo} - ${c.nombre} (${c.creditos} cr)`;
-        btn.onclick = () => {
-          if (!btn.classList.contains('unlocked')) return;
-          if (aprobados.has(c.codigo)) {
-            aprobados.delete(c.codigo);
-            btn.classList.remove('approved');
+    niveles.forEach(nivel => {
+      const section = document.createElement('div');
+      section.className = 'semestre';
+      section.innerHTML = `<h2>Semestre ${nivel}</h2>`;
+
+      malla.filter(curso => curso.semestre === nivel).forEach(curso => {
+        const div = document.createElement('div');
+        div.className = 'curso';
+        div.id = curso.codigo;
+        div.textContent = `${curso.codigo} - ${curso.nombre} (${curso.creditos} cr)`;
+
+        div.onclick = () => {
+          if (!div.classList.contains('unlocked')) return;
+
+          if (aprobados.has(curso.codigo)) {
+            aprobados.delete(curso.codigo);
+            div.classList.remove('approved');
           } else {
-            aprobados.add(c.codigo);
-            btn.classList.add('approved');
+            aprobados.add(curso.codigo);
+            div.classList.add('approved');
           }
           actualizar();
         };
-        sec.appendChild(btn);
+
+        section.appendChild(div);
       });
-      cont.appendChild(sec);
+
+      cont.appendChild(section);
     });
 
     function actualizar() {
-      malla.forEach(c => {
-        const el = document.getElementById(c.codigo);
-        const puede = c.req.every(r => aprobados.has(r));
+      malla.forEach(curso => {
+        const puede = curso.req.every(r => aprobados.has(r));
+        const el = document.getElementById(curso.codigo);
         if (puede) el.classList.add('unlocked');
         else {
           el.classList.remove('unlocked');
-          if (aprobados.has(c.codigo)) {
-            aprobados.delete(c.codigo);
-            el.classList.remove('approved');
-          }
+          el.classList.remove('approved');
+          aprobados.delete(curso.codigo);
         }
       });
 
-      // Calcular créditos
       let totalCreditos = 0;
-      malla.forEach(c => {
-        if (aprobados.has(c.codigo)) totalCreditos += c.creditos || 0;
+      malla.forEach(curso => {
+        if (aprobados.has(curso.codigo)) totalCreditos += curso.creditos;
       });
       contador.textContent = `Créditos aprobados: ${totalCreditos}`;
     }
