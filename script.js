@@ -1,4 +1,4 @@
-fetch('datamalla.json')
+fetch('datamalla')
   .then(response => response.json())
   .then(data => {
     const malla = document.getElementById('malla');
